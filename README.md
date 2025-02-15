@@ -1,7 +1,5 @@
 # Deep Monapara - Portfolio
 
-![Portfolio Screenshot](https://via.placeholder.com/1200x600.png?text=Portfolio+Preview)
-
 ## 🚀 About the Project
 This is my personal portfolio built with **Laravel** and **Bootstrap**. It showcases my skills, projects, and social profiles in a clean and professional way.
 
@@ -51,11 +49,6 @@ This is my personal portfolio built with **Laravel** and **Bootstrap**. It showc
    php artisan serve
    ```
 5. Open `http://127.0.0.1:8000/` in your browser 🚀
-
-## 🌐 Deployment
-To host this project for free, consider:
-- [Vercel](https://vercel.com/) (Frontend)
-- [Railway](https://railway.app/) or [Render](https://render.com/) (Backend)
 
 ## 🏆 Author
 👤 **Deep Monapara**  
