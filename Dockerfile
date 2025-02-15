@@ -4,7 +4,7 @@ FROM php:8.2-apache
 # Set working directory
 WORKDIR /var/www/html
 
-# Install required extensions
+# Install dependencies with updated package sources
 RUN apt-get update && apt-get install -y \
     unzip \
     curl \
@@ -16,7 +16,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql mbstring xml bcmath zip
+    && docker-php-ext-install gd pdo pdo_mysql mbstring xml bcmath zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache Rewrite module
 RUN a2enmod rewrite
@@ -28,7 +30,7 @@ COPY . .
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# **Update Apache to use Laravel's public directory**
+# Update Apache to serve Laravel from the public directory
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 
 # Restart Apache
