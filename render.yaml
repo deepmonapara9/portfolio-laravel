@@ -1,0 +1,12 @@
+services:
+  - name: portfolio-laravel
+    type: web
+    runtime: php
+    plan: free
+    buildCommand: |
+      apt-get update && apt-get install -y unzip curl php-cli php-mbstring php-xml php-bcmath php-zip php-tokenizer php-curl php-mysql php-pdo php-ctype php-json php-common
+      curl -sS https://getcomposer.org/installer | php
+      mv composer.phar /usr/local/bin/composer
+      composer install --no-dev --optimize-autoloader
+      php artisan key:generate
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
