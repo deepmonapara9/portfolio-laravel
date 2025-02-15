@@ -1,7 +1,10 @@
-# Use the official PHP image with necessary extensions
-FROM php:8.2-fpm
+# Use official PHP image with Apache
+FROM php:8.2-apache
 
-# Install system dependencies
+# Set working directory
+WORKDIR /var/www/html
+
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     unzip \
     curl \
@@ -12,29 +15,24 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     git \
+    libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql mbstring xml bcmath zip
+    && docker-php-ext-install gd pdo pdo_mysql mbstring xml bcmath zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy project files
+# Copy Laravel files
 COPY . .
 
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader
-
 # Set permissions
-RUN chmod -R 777 storage bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Generate Laravel application key
-RUN php artisan key:generate
+# Expose port 80
+EXPOSE 80
 
-# Expose port
-EXPOSE 8000
-
-# Start Laravel application
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Start Apache
+CMD ["apache2-foreground"]
