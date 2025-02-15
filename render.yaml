@@ -1,12 +1,25 @@
 services:
   - name: portfolio-laravel
     type: web
-    runtime: php
+    runtime: docker
     plan: free
+    repo: https://github.com/deepmonapara9/portfolio-laravel
+    region: oregon
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_KEY
+        sync: false
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: your-db-host
+      - key: DB_DATABASE
+        value: your-db-name
+      - key: DB_USERNAME
+        value: your-db-user
+      - key: DB_PASSWORD
+        value: your-db-password
     buildCommand: |
-      apt-get update && apt-get install -y unzip curl php-cli php-mbstring php-xml php-bcmath php-zip php-tokenizer php-curl php-mysql php-pdo php-ctype php-json php-common
-      curl -sS https://getcomposer.org/installer | php
-      mv composer.phar /usr/local/bin/composer
-      composer install --no-dev --optimize-autoloader
-      php artisan key:generate
-    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+      docker build -t portfolio-laravel .
+    startCommand: docker run -p 8000:8000 portfolio-laravel
