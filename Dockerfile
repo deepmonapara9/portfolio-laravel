@@ -1,10 +1,10 @@
-# Use official PHP image with Apache
+# Use official PHP image
 FROM php:8.2-apache
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Install dependencies
+# Install required extensions
 RUN apt-get update && apt-get install -y \
     unzip \
     curl \
@@ -15,21 +15,24 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     git \
-    libzip-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql mbstring xml bcmath zip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install gd pdo pdo_mysql mbstring xml bcmath zip
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Enable Apache Rewrite module
+RUN a2enmod rewrite
 
-# Copy Laravel files
+# Copy project files
 COPY . .
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# **Update Apache to use Laravel's public directory**
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
+
+# Restart Apache
+RUN service apache2 restart
 
 # Expose port 80
 EXPOSE 80
